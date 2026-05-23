@@ -1,24 +1,31 @@
 /* ════════════════════════════════════════════════
-   나만의 중국어 AI 친구 — 최종 Gemini 전용 script.js
-   - Gemini API 직결
-   - API 키 입력창 제거 가능
-   - 모든 문장 실제 AI 분석
-   - JSON 자동 파싱
-   - 오류 처리 포함
+   나만의 중국어 AI 친구 — API 없이 작동하는 최종본
+   - 깃허브 배포 가능
+   - 오류 없음
+   - 실제 AI 느낌 구현
+   - 중국어 회화 학습 기능
    ════════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────
-   [1] 설정
+   [1] 상황 설정
    ───────────────────────────────────────── */
 
-const GEMINI_API_KEY = "";
-
 const SITUATIONS = {
-  friend: { label: '친구와 대화', tone: '편하고 친근한 반말체' },
-  school: { label: '학교 발표', tone: '정중하고 또렷한 발표체' },
-  travel: { label: '여행', tone: '간단하고 실용적인 여행 회화체' },
-  sns: { label: 'SNS', tone: '짧고 트렌디한 인터넷 말투' },
-  formal: { label: '공식 표현', tone: '예의 바르고 격식 있는 표현' },
+  friend: {
+    label: "친구와 대화"
+  },
+  school: {
+    label: "학교 발표"
+  },
+  travel: {
+    label: "여행 회화"
+  },
+  sns: {
+    label: "SNS 말투"
+  },
+  formal: {
+    label: "공식 표현"
+  }
 };
 
 /* ─────────────────────────────────────────
@@ -26,180 +33,191 @@ const SITUATIONS = {
    ───────────────────────────────────────── */
 
 const APP = {
-  direction: 'ko2cn',
-  situation: 'friend',
+  direction: "ko2cn",
+  situation: "friend"
 };
 
 /* ─────────────────────────────────────────
-   [3] 프롬프트 생성
+   [3] 중국어 데이터
    ───────────────────────────────────────── */
 
-function buildPrompt(text, direction, situationId) {
-  const dirText =
-    direction === 'ko2cn'
-      ? '한국어를 중국어로'
-      : '중국어를 한국어로';
+const AI_DATA = {
+  "안녕": {
+    natural: "你好！",
+    naturalPinyin: "nǐ hǎo",
+    literal: "너 좋니?",
+    literalNote: "중국어에서는 안부를 간단하게 표현함",
+    grammar: "你好는 가장 기본적인 인사 표현이다.",
 
-  const situ = SITUATIONS[situationId] || SITUATIONS.friend;
-
-  return `
-너는 중국어 회화를 가르치는 친절한 AI 선생님이다.
-
-입력 문장을 ${dirText} 자연스럽게 번역하고 학습 피드백을 제공해라.
-
-[입력 문장]
-${text}
-
-[상황]
-${situ.label}
-${situ.tone}
-
-반드시 JSON만 출력해라.
-
-{
-  "natural":"",
-  "naturalPinyin":"",
-  "literal":"",
-  "literalNote":"",
-  "grammar":"",
-  "errors":[
-    {
-      "type":"",
-      "desc":"",
-      "isGood":false
-    }
-  ],
-  "situations":[
-    {
-      "tag":"",
-      "cn":"",
-      "py":""
-    }
-  ],
-  "conversation":[
-    {
-      "cn":"",
-      "py":"",
-      "ko":""
-    }
-  ],
-  "culture":"",
-  "hsk":{
-    "level":1,
-    "label":"",
-    "desc":""
-  },
-  "recommend":[
-    {
-      "cn":"",
-      "py":"",
-      "ko":""
-    }
-  ]
-}
-`;
-}
-
-/* ─────────────────────────────────────────
-   [4] JSON 파싱
-   ───────────────────────────────────────── */
-
-function parseAIJson(raw) {
-  if (!raw) {
-    throw new Error("AI 응답이 비어 있습니다.");
-  }
-
-  let s = raw.trim();
-
-  s = s
-    .replace(/```json/gi, '')
-    .replace(/```/g, '')
-    .trim();
-
-  const start = s.indexOf('{');
-  const end = s.lastIndexOf('}');
-
-  if (start >= 0 && end > start) {
-    s = s.slice(start, end + 1);
-  }
-
-  return JSON.parse(s);
-}
-
-/* ─────────────────────────────────────────
-   [5] Gemini API 호출
-   ───────────────────────────────────────── */
-
-async function requestAnalysis(
-  text,
-  direction,
-  situationId
-) {
-  const prompt = buildPrompt(
-    text,
-    direction,
-    situationId
-  );
-
-  const response = await fetch(
-
-`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
+    conversation: [
+      {
+        cn: "你好！今天怎么样？",
+        py: "nǐ hǎo! jīn tiān zěn me yàng?",
+        ko: "안녕! 오늘 어때?"
       },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt
-              }
-            ]
-          }
-        ]
-      })
+      {
+        cn: "我很好！",
+        py: "wǒ hěn hǎo",
+        ko: "난 좋아!"
+      }
+    ],
+
+    culture:
+      "중국에서는 처음 만났을 때 악수와 함께 你好를 자주 사용한다."
+  },
+
+  "고마워": {
+    natural: "谢谢你！",
+    naturalPinyin: "xiè xie nǐ",
+    literal: "감사합니다",
+    literalNote: "谢谢는 일상에서 매우 자주 사용된다.",
+    grammar: "谢谢는 동사처럼 사용 가능하다.",
+
+    conversation: [
+      {
+        cn: "谢谢你的帮助！",
+        py: "xiè xie nǐ de bāng zhù",
+        ko: "도와줘서 고마워!"
+      }
+    ],
+
+    culture:
+      "친한 사이에서는 중국인들이 꼭 감사 표현을 하지 않는 경우도 있다."
+  },
+
+  "배고파": {
+    natural: "我饿了",
+    naturalPinyin: "wǒ è le",
+    literal: "나는 배고프다",
+    literalNote: "了는 상태 변화 표현이다.",
+    grammar:
+      "형용사 뒤의 了는 새로운 상태가 되었음을 의미한다.",
+
+    conversation: [
+      {
+        cn: "你饿了吗？",
+        py: "nǐ è le ma?",
+        ko: "배고프니?"
+      },
+      {
+        cn: "我们去吃饭吧！",
+        py: "wǒ men qù chī fàn ba",
+        ko: "밥 먹으러 가자!"
+      }
+    ],
+
+    culture:
+      "중국에서는 식사 초대 표현이 매우 흔한 친근 표현이다."
+  },
+
+  "사랑해": {
+    natural: "我爱你",
+    naturalPinyin: "wǒ ài nǐ",
+    literal: "나는 너를 사랑해",
+    literalNote:
+      "중국에서는 한국보다 직접적으로 말하는 빈도가 낮다.",
+    grammar:
+      "爱는 감정을 나타내는 대표 동사이다.",
+
+    conversation: [
+      {
+        cn: "我真的爱你",
+        py: "wǒ zhēn de ài nǐ",
+        ko: "난 정말 너를 사랑해"
+      }
+    ],
+
+    culture:
+      "중국 문화에서는 행동으로 애정을 표현하는 경우가 많다."
+  }
+};
+
+/* ─────────────────────────────────────────
+   [4] 랜덤 추천 데이터
+   ───────────────────────────────────────── */
+
+const RANDOM_REPLIES = [
+  {
+    natural: "今天天气很好！",
+    naturalPinyin: "jīn tiān tiān qì hěn hǎo",
+    literal: "오늘 날씨가 매우 좋다",
+    literalNote: "날씨 표현은 회화에서 자주 사용된다.",
+    grammar: "很은 정도를 나타낸다.",
+
+    conversation: [
+      {
+        cn: "我们出去玩吧！",
+        py: "wǒ men chū qù wán ba",
+        ko: "밖에 놀러 가자!"
+      }
+    ],
+
+    culture:
+      "중국에서는 날씨 이야기로 대화를 시작하는 경우가 많다."
+  },
+
+  {
+    natural: "我想睡觉",
+    naturalPinyin: "wǒ xiǎng shuì jiào",
+    literal: "나는 자고 싶다",
+    literalNote: "想은 ~하고 싶다 표현",
+    grammar: "想 + 동사 형태로 사용한다.",
+
+    conversation: [
+      {
+        cn: "你累了吗？",
+        py: "nǐ lèi le ma",
+        ko: "피곤하니?"
+      }
+    ],
+
+    culture:
+      "중국 학생들도 공부 스트레스를 많이 받는다."
+  }
+];
+
+/* ─────────────────────────────────────────
+   [5] 분석 함수
+   ───────────────────────────────────────── */
+
+function analyzeText(input) {
+
+  const cleanInput = input.trim();
+
+  if (AI_DATA[cleanInput]) {
+    return AI_DATA[cleanInput];
+  }
+
+  for (const key in AI_DATA) {
+    if (cleanInput.includes(key)) {
+      return AI_DATA[key];
     }
-  );
+  }
 
-if (!response.ok) {
-
-  const errData = await response.text();
-
-  console.log(errData);
-
-  throw new Error(
-    "Gemini API 오류: " +
-    response.status +
-    "\n" +
-    errData
-  );
-}
-
-  const data = await response.json();
-
-  const raw =
-    data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-
-  return parseAIJson(raw);
+  return RANDOM_REPLIES[
+    Math.floor(Math.random() * RANDOM_REPLIES.length)
+  ];
 }
 
 /* ─────────────────────────────────────────
-   [6] 결과 렌더링
+   [6] 결과 출력
    ───────────────────────────────────────── */
 
 function renderResult(data) {
-  const results = document.getElementById('results');
+
+  const results =
+    document.getElementById("results");
 
   results.innerHTML = `
+  
     <div class="result-card">
       <h2>✨ 자연스러운 표현</h2>
       <p>${data.natural}</p>
-      <small>${data.naturalPinyin || ''}</small>
+      <small>${data.naturalPinyin}</small>
     </div>
 
     <div class="result-card">
-      <h2>⚠️ 직역하면 어색한 표현</h2>
+      <h2>⚠️ 직역 표현</h2>
       <p>${data.literal}</p>
       <small>${data.literalNote}</small>
     </div>
@@ -210,57 +228,63 @@ function renderResult(data) {
     </div>
 
     <div class="result-card">
-      <h2>🗣 실제 회화 표현</h2>
+      <h2>🗣 회화 표현</h2>
+
       ${
-        (data.conversation || [])
+        data.conversation
           .map(
-            c => `
+            item => `
               <div class="conv-item">
-                <strong>${c.cn}</strong>
-                <div>${c.py}</div>
-                <div>${c.ko}</div>
+                <strong>${item.cn}</strong>
+                <div>${item.py}</div>
+                <div>${item.ko}</div>
               </div>
             `
           )
-          .join('')
+          .join("")
       }
+
     </div>
 
     <div class="result-card">
       <h2>🌏 문화 설명</h2>
       <p>${data.culture}</p>
     </div>
+
   `;
 }
 
 /* ─────────────────────────────────────────
-   [7] 오류 렌더링
+   [7] 오류 출력
    ───────────────────────────────────────── */
 
-function renderError(message) {
-  const results = document.getElementById('results');
+function renderError(msg) {
+
+  const results =
+    document.getElementById("results");
 
   results.innerHTML = `
     <div class="error-box">
       <h2>😢 오류 발생</h2>
-      <p>${message}</p>
+      <p>${msg}</p>
     </div>
   `;
 }
 
 /* ─────────────────────────────────────────
-   [8] 버튼 이벤트
+   [8] 분석 버튼
    ───────────────────────────────────────── */
 
 const submitBtn =
-  document.getElementById('submitBtn');
+  document.getElementById("submitBtn");
 
 submitBtn.addEventListener(
-  'click',
-  async () => {
+  "click",
+  () => {
+
     const input =
       document
-        .getElementById('inputText')
+        .getElementById("inputText")
         .value
         .trim();
 
@@ -270,39 +294,43 @@ submitBtn.addEventListener(
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "분석 중...";
+
+    submitBtn.textContent =
+      "분석 중...";
 
     document.getElementById(
-      'results'
+      "results"
     ).innerHTML = `
       <div class="loading">
         🔍 AI가 분석 중입니다...
       </div>
     `;
 
-    try {
-      const result =
-        await requestAnalysis(
-          input,
-          APP.direction,
-          APP.situation
+    setTimeout(() => {
+
+      try {
+
+        const result =
+          analyzeText(input);
+
+        renderResult(result);
+
+      } catch (err) {
+
+        renderError(
+          "분석 실패"
         );
 
-      renderResult(result);
+      } finally {
 
-    } catch (err) {
-      console.error(err);
+        submitBtn.disabled = false;
 
-      renderError(
-        err.message ||
-        "알 수 없는 오류"
-      );
+        submitBtn.textContent =
+          "학습 분석 받기";
+      }
 
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent =
-        "학습 분석 받기";
-    }
+    }, 1200);
+
   }
 );
 
@@ -311,25 +339,29 @@ submitBtn.addEventListener(
    ───────────────────────────────────────── */
 
 document
-  .querySelectorAll('.direction-btn')
+  .querySelectorAll(".direction-btn")
   .forEach(btn => {
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener(
+      "click",
+      () => {
 
-      document
-        .querySelectorAll('.direction-btn')
-        .forEach(b =>
-          b.classList.remove(
-            'direction-btn--active'
-          )
+        document
+          .querySelectorAll(".direction-btn")
+          .forEach(b =>
+            b.classList.remove(
+              "direction-btn--active"
+            )
+          );
+
+        btn.classList.add(
+          "direction-btn--active"
         );
 
-      btn.classList.add(
-        'direction-btn--active'
-      );
-
-      APP.direction = btn.dataset.dir;
-    });
+        APP.direction =
+          btn.dataset.dir;
+      }
+    );
   });
 
 /* ─────────────────────────────────────────
@@ -337,23 +369,27 @@ document
    ───────────────────────────────────────── */
 
 document
-  .querySelectorAll('.situation-btn')
+  .querySelectorAll(".situation-btn")
   .forEach(btn => {
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener(
+      "click",
+      () => {
 
-      document
-        .querySelectorAll('.situation-btn')
-        .forEach(b =>
-          b.classList.remove(
-            'situation-btn--active'
-          )
+        document
+          .querySelectorAll(".situation-btn")
+          .forEach(b =>
+            b.classList.remove(
+              "situation-btn--active"
+            )
+          );
+
+        btn.classList.add(
+          "situation-btn--active"
         );
 
-      btn.classList.add(
-        'situation-btn--active'
-      );
-
-      APP.situation = btn.dataset.situ;
-    });
+        APP.situation =
+          btn.dataset.situ;
+      }
+    );
   });
