@@ -157,6 +157,38 @@ function parseAIJson(raw) {
 async function requestAnalysis(text, direction, situationId) {
   const prompt = buildPrompt(text, direction, situationId);
 
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: prompt }
+            ]
+          }
+        ]
+      })
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Gemini 오류: " + res.status);
+  }
+
+  const data = await res.json();
+
+  const raw =
+    data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+  return parseAIJson(raw);
+} {
+  const prompt = buildPrompt(text, direction, situationId);
+
   if (CONFIG.MODE === 'backend') {
     return await viaBackend(text, direction, situationId);
   } else if (CONFIG.MODE === 'direct-anthropic') {
