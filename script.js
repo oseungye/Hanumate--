@@ -186,18 +186,7 @@ async function requestAnalysis(text, direction, situationId) {
     data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
   return parseAIJson(raw);
-} {
-  const prompt = buildPrompt(text, direction, situationId);
-
-  if (CONFIG.MODE === 'backend') {
-    return await viaBackend(text, direction, situationId);
-  } else if (CONFIG.MODE === 'direct-anthropic') {
-    return await viaAnthropic(prompt);
-  } else if (CONFIG.MODE === 'direct-openai') {
-    return await viaOpenAI(prompt);
-  }
-  throw new Error('알 수 없는 CONFIG.MODE 입니다: ' + CONFIG.MODE);
-}
+} 
 
 // (1) 권장: 내 서버리스 백엔드 호출 (키는 서버가 보관)
 async function viaBackend(text, direction, situationId) {
