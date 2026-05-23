@@ -162,11 +162,19 @@ async function requestAnalysis(
     }
   );
 
-  if (!response.ok) {
-    throw new Error(
-      "Gemini API 오류: " + response.status
-    );
-  }
+if (!response.ok) {
+
+  const errData = await response.text();
+
+  console.log(errData);
+
+  throw new Error(
+    "Gemini API 오류: " +
+    response.status +
+    "\n" +
+    errData
+  );
+}
 
   const data = await response.json();
 
