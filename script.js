@@ -24,7 +24,7 @@
   MODE: 'gemini'
 };
 
-const GEMINI_API_KEY = "여기에_네_API키";
+const GEMINI_API_KEY = "AIzaSyCxLA_aHwp4M164SJ6BEUzbaTu19W7GR1A";
 const SITUATIONS = {
   friend: { label: '친구와 대화', tone: '편하고 친근한 반말체' },
   school: { label: '학교 발표', tone: '정중하고 또렷한 발표체' },
