@@ -103,7 +103,7 @@
           <div class="intro__card">
             <div class="intro__num">弐</div>
             <h3>何を扱うのか</h3>
-            <p>文禄・慶長の役から独島・竹島問題、さらにヒロシマの記憶や多文化共生まで、東アジアの歴史認識をめぐる主題を扱います。<span class="ko-note">무엇을 다루는가 — 갈등을 넘어 평화·공생까지</span></p>
+            <p>文禄・慶長の役から在日朝鮮人の歩み、ヒロシマの被爆の記憶、そして多文化共生まで、東アジアの歴史認識と記憶をめぐる主題を扱います。<span class="ko-note">무엇을 다루는가 — 갈등을 넘어 평화·공생까지</span></p>
           </div>
           <div class="intro__card">
             <div class="intro__num">参</div>
@@ -196,7 +196,11 @@
           <h3 class="section-h">共同歴史叙述を提案する<span class="ko-note">공동 역사 서술 제안</span></h3>
           <p class="shared-box__desc">
             三か国の叙述を読んだうえで、今度はあなたが提案する番です。<br />
-            中立的で事実に基づいた「共同の表現」を書いてみましょう。日本語・韓国語・英語のいずれでも入力できます。
+            次のいずれかの観点から「共同の表現」を書いてみましょう。日本語・韓国語・英語のいずれでも入力できます。<br />
+            <span class="ko-note" style="margin-top:0.8rem;">
+              ① 中立的な歴史表現 ／ ② 相互理解のための表現 ／ ③ 未来志向の共同メッセージ ／ ④ 多文化共生につながる提案<br />
+              ① 중립적 표현 · ② 상호 이해 · ③ 미래지향 공동 메시지 · ④ 다문화 공생 제안
+            </span>
           </p>
 
           <div class="shared-form">
@@ -206,14 +210,24 @@
             <input type="text" id="userName" class="shared-form__input" placeholder="例：歴史太郎 / 김역사 / History Hana" />
 
             <label class="shared-form__label">
-              <span class="shared-form__num">②</span> 中立的な表現を書く ／ 共同歴史叙述を提案する
+              <span class="shared-form__num">②</span> 表現のタイプ ／ 표현 유형
+            </label>
+            <select id="userType" class="shared-form__input">
+              <option value="中立的な歴史表現">中立的な歴史表現 ／ 중립적 표현</option>
+              <option value="相互理解のための表現">相互理解のための表現 ／ 상호 이해</option>
+              <option value="未来志向の共同メッセージ">未来志向の共同メッセージ ／ 미래지향 메시지</option>
+              <option value="多文化共生につながる提案">多文化共生につながる提案 ／ 다문화 공생 제안</option>
+            </select>
+
+            <label class="shared-form__label">
+              <span class="shared-form__num">③</span> 共同の表現を書く ／ 공동 표현 작성
             </label>
             <textarea id="userNarrative" class="shared-form__textarea" rows="4" placeholder="共同の歴史表現を入力してください / 공동의 역사 표현을 입력하세요 / Enter a shared historical narrative"></textarea>
 
             <label class="shared-form__label">
-              <span class="shared-form__num">③</span> そのように表現した理由 ／ 意見を入力する
+              <span class="shared-form__num">④</span> そのように表現した理由 ／ 意見を入力する
             </label>
-            <textarea id="userReason" class="shared-form__textarea" rows="3" placeholder="例：特定の国の視点を強調せず、共通の被害と平和への願いに焦点を当てるため……"></textarea>
+            <textarea id="userReason" class="shared-form__textarea" rows="3" placeholder="例：特定の国を一方的に責めるのではなく、被害と責任の双方に配慮し、共生の未来に焦点を当てるため……"></textarea>
 
             <button class="btn btn--primary" id="submitNarrative">提案を登録する</button>
           </div>
